@@ -49,9 +49,6 @@ class ReplayBuffer:
             
     def sample(self, batch_size, to_gpu=False, norm_r=False):
         idxs = np.random.choice(np.arange(self.filled), size=batch_size, replace=False)
-        #print(max(idxs))
-        #print(self.filled)
-        #print(len(self.rmemory[1]))
         device = 'cpu'
         if to_gpu:
             device = 'cuda'
@@ -68,11 +65,7 @@ class ReplayBuffer:
             actions.append(torch.FloatTensor(np.vstack([self.actmemory[i][idx] for idx in idxs])).to(device))
             nobs.append(torch.FloatTensor(np.vstack([self.nobsmemory[i][idx] for idx in idxs])).to(device))
             dones.append(torch.ByteTensor(np.vstack([self.donememory[i][idx] for idx in idxs]).astype(np.uint8)).to(device))
-        #print('\n\nobs_list_len', len(obs),  obs[0].shape)
-        #print('\n\nactions_list_len', len(actions), actions[0].shape)
-        #print('\n\nrewards_list_len', len(rewards), rewards[0].shape)
-        #print('\n\nnobs_list_len', len(nobs), nobs[0].shape)
-        #print('\n\ndones_list_len', len(dones), dones[0].shape)
+            
         return (obs, actions, rewards, nobs, dones)
     
     def get_average_rewards(self, N):
