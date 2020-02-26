@@ -12,7 +12,7 @@ from pathlib import Path
 from unityagents import UnityEnvironment
 
 import buffer
-import MADDPGAgent
+import agent
 
 
 
@@ -42,13 +42,13 @@ def run(config):
         cuda = True
     else:
         cuda = False
-    env = UnityEnvironment(file_name="/data/Tennis_Linux_NoVis/Tennis")
+    env = UnityEnvironment(file_name=config.env)
     brain_name = env.brain_names[0]
     brain = env.brains[brain_name]
     env_info = env.reset(train_mode=True)[brain_name]
     num_agents = len(env_info.agents)
     
-    maddpg = MADDPGAgent.MADDPG.init_from_env(env_info, brain, hid1=config.hid1, hid2=config.hid2, norm=config.norm,
+    maddpg = agent.MADDPG.init_from_env(env_info, brain, hid1=config.hid1, hid2=config.hid2, norm=config.norm,
                                               lra=config.lra, lrc=config.lrc, epsilon=config.epsilon, gamma=config.gamma,
                                               tau=config.tau)
     print('\nAgent 1:\n')
@@ -121,13 +121,16 @@ def run(config):
     
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
+    parser.add_argument('--env', default="/data/Tennis_Linux_NoVis/Tennis", type=str,
+                        required=True, help="Path to environment file.")
     parser.add_argument('--cuda', default=False, type=bool)
     parser.add_argument('--seed', default=1, type=int)
     parser.add_argument('--hid1', default=256, type=int)
     parser.add_argument('--hid2', default=128, type=int)
-    parser.add_argument('--norm', default='layer', type=str, help="Normalization layer takes values 'batch' for BatchNorm, \
-                                                                   'layer' for LayerNorm, and any other value for no \
-                                                                    normalization layer.")
+    parser.add_argument('--norm', default='layer', type=str,
+                        help="Normalization layer takes values \
+                        'batch' for BatchNorm, 'layer' for LayerNorm, \
+                        and any other value for no normalization layer.")
     parser.add_argument('--lra', default=1e-4, type=float)
     parser.add_argument('--lrc', default=1e-3, type=float)
     parser.add_argument('--epsilon', default=0.3, type=float)
