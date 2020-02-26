@@ -28,7 +28,7 @@ class Actor(nn.Module):
         self.net.add_module('nl2', nn.ReLU())
         self.net.add_module('fc3', nn.Linear(hid2, act_size))
         
-    def forward(self, x): #sample=True
+    def forward(self, x):
         one_hot = None
         
         # separates one_hot to avoid batch normalizing it
@@ -125,19 +125,15 @@ class AttentionCritic(nn.Module):
         for parameter in self.shared_parameters():
             if parameter.grad is not None:
                 parameter.grad.data.mul_(1. / self.n_agents)
-            #print(parameter.shape)
-            #if parameter.grad is None:
-                #print(parameter.grad)
     
     def forward(self, x, agents=None, return_q=True, return_allqs=False, regularize=False, return_att=False):
         if agents is None:
             agents = range(len(self.sa_encoders))
         
-        #print(self.s_encoders[0][0])
         # creates input types list of size 'agents' with tensors for each input for each agent    
         states = [state for state, _ in x] # list with tensors of shape (batch_size, observation size)
         actions = [action for _, action in x] # list with tensors of shape (batch_size, action size)
-        state_actions = [torch.cat((state, action), dim=1) for state, action in x] # l w/ tensors of shape (batch, obs+act_size)
+        state_actions = [torch.cat((state, action), dim=1) for state, action in x] # l w/ tensors of shape(batch, obs+act_size)
         
         # creates lists of state & state-actions encodings of length 'agents' with tensors for each encoding
         s_encodings = [self.s_encoders[agent](states[agent]) for agent in agents] # list with tensors of shape (batch, hidc)     
@@ -157,7 +153,7 @@ class AttentionCritic(nn.Module):
         for h_keys, h_vals, h_selectors in zip(heads_keys, heads_vals, heads_selectors):
             ### iterates over agents within each head in the keys, vals and selectors lists
             for i, agent, selector in zip(range(len(agents)), agents, h_selectors):
-                # creates list(len'agents-1') for the keys & vals of all agents other than the current agent being iterated over
+                # creates list(len'agents-1') for keys & vals of all agents other than the current agent being iterated over
                 keys = [key for j, key in enumerate(h_keys) if j != agent] # list w/ tensors of shape (batch, att_dim)
                 vals = [val for j, val in enumerate(h_vals) if j != agent] # list w/ tensors of shape (batch, att_dim)
                 
@@ -253,7 +249,7 @@ class AttentionAgent:
         
         
         
-class AttentionSAC:
+class AttentionAC:
     def __init__(self, init_params, sa_size, norm='layer', gamma=0.99, tau=0.01, lra=0.01, lrc=0.01, 
                 hid1=400, hid2=300, hidc=400, att_heads=1, **kwargs):
         self.n_agents = len(sa_size)
