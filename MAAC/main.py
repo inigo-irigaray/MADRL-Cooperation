@@ -12,7 +12,7 @@ from unityagents import UnityEnvironment
 from collections import deque
 
 import buffer
-import MAACAgent
+import agent
 
 
 
@@ -48,9 +48,9 @@ def run(config):
     env_info = env.reset(train_mode=True)[brain_name]
     num_agents = len(env_info.agents)
     
-    maac = MAACAgent.AttentionSAC.init_from_env(env_info, brain, norm=config.norm, gamma=config.gamma, tau=config.tau,
-                                                lra=config.lra, lrc=config.lrc, hid1=config.hid1, hid2=config.hid2,
-                                                hidc=config.hidc, att_heads=config.att_heads)
+    maac = agent.AttentionAC.init_from_env(env_info, brain, norm=config.norm, gamma=config.gamma, tau=config.tau,
+                                           lra=config.lra, lrc=config.lrc, hid1=config.hid1, hid2=config.hid2,
+                                           hidc=config.hidc, att_heads=config.att_heads)
     
     repbuffer = buffer.ReplayBuffer(config.capacity, maac.n_agents,
                                  [brain.vector_observation_space_size for _ in range(maac.n_agents)],
