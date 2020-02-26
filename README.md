@@ -25,7 +25,7 @@
  
  · <a href=https://s3-us-west-1.amazonaws.com/udacity-drlnd/P3/Tennis/Tennis_Linux_NoVis.zip>AWS(headless)</a>
  
- ### Requirements
+ ## Requirements
  
  Nanodegree's prerequisites: <a href=https://github.com/udacity/deep-reinforcement-learning/#dependencies>link.</a>
  
@@ -47,7 +47,7 @@
     tensorboardX==1.4
     unityagents
 
-### Running the models
+## Running the models
 
 <p align=justify> To run the different models available in this repository one only needs to clone/download from this repository the appropiate files from the folder of the model he/she wants to run and write in the command line: </p>
 
