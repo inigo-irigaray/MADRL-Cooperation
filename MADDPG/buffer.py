@@ -52,7 +52,7 @@ class ReplayBuffer:
         device = 'cpu'
         if to_gpu:
             device = 'cuda'
-        # normalizes rewards if required
+
         obs, actions, rewards, nobs, dones = [], [], [], [], []
         for i in range(self.num_agents):
             rewards.append(torch.FloatTensor(np.vstack([self.rmemory[i][idx] for idx in idxs])).to(device))
