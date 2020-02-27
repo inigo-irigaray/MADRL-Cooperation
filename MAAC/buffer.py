@@ -47,7 +47,7 @@ class ReplayBuffer:
                 self.donememory[i][self.current % self.capacity] = dones[i]
                 self.current += 1
             
-    def sample(self, batch_size, to_gpu=False, norm_r=False):
+    def sample(self, batch_size, to_gpu=False):
         idxs = np.random.choice(np.arange(self.filled), size=batch_size, replace=False)
         device = 'cpu'
         if to_gpu:
@@ -55,23 +55,10 @@ class ReplayBuffer:
         # normalizes rewards if required
         obs, actions, rewards, nobs, dones = [], [], [], [], []
         for i in range(self.num_agents):
-            if norm_r:
-                r = [cast((self.reward_buffers[agent_i][idxs] - self.reward_buffers[agent_i][idxs].mean()) /
-                      self.reward_buffers[agent_i][idxs].std()) for agent_i in range(self.n_agents)]
-            else:
-                rewards.append(torch.FloatTensor(np.vstack([self.rmemory[i][idx] for idx in idxs])).to(device))
-            
+            rewards.append(torch.FloatTensor(np.vstack([self.rmemory[i][idx] for idx in idxs])).to(device))
             obs.append(torch.FloatTensor(np.vstack([self.obsmemory[i][idx] for idx in idxs])).to(device))
             actions.append(torch.FloatTensor(np.vstack([self.actmemory[i][idx] for idx in idxs])).to(device))
             nobs.append(torch.FloatTensor(np.vstack([self.nobsmemory[i][idx] for idx in idxs])).to(device))
             dones.append(torch.ByteTensor(np.vstack([self.donememory[i][idx] for idx in idxs]).astype(np.uint8)).to(device))
             
         return (obs, actions, rewards, nobs, dones)
-    
-    def get_average_rewards(self, N):
-        if self.filled_i == self.capacity:
-            idxs = np.arange(self.current_i - N, self.current_i)
-        else:
-            idxs = np.arange(max(0, current_i - N), self.current_i)
-            
-        return [self.reward_buffers[agent_i][idxs] for agent_i in range(self.n_agents)]
